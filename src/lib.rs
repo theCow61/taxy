@@ -6,6 +6,7 @@ pub enum Team {
     O,
     X,
     E,
+    T,
 }
 impl std::fmt::Display for Team {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
@@ -13,6 +14,7 @@ impl std::fmt::Display for Team {
             Team::O => 'O',
             Team::X => 'X',
             Team::E => ' ',
+            Team::T => 'T',
         };
         write!(f, "{}", printable)
     }
@@ -134,11 +136,22 @@ impl GridnRend {
             self.winner = Some(self.active_team);
             return Some(self.active_team)
         }
+        let mut vextor = Vec::new(); // vector and loop to transform self_grid into a 1d array from a 2d array so i can analyze all the data at once
+        for (_i, row) in self.grid_data.iter().enumerate() {
+            for (_j, col) in row.iter().enumerate() {
+                vextor.push(col);
+            }
+        }
+        if vextor.iter().all(|&i| i != &Team::E) {
+            self.winner = Some(Team::T);
+            return Some(self.winner.unwrap())
+        }
         // switch teams if doesn't win
         match self.active_team {
             Team::X => self.active_team = Team::O,
             Team::O => self.active_team = Team::X,
             Team::E => println!("You have an unfortinate future..."),
+            Team::T => println!("Tie"),
         }
         None
     }

@@ -1,4 +1,5 @@
 use taxy::GridnRend;
+use taxy::Team;
 
 pub fn run(hostip: &str) {
     let listener = std::net::TcpListener::bind(hostip).expect("Could not bind...");
@@ -19,6 +20,10 @@ pub fn run(hostip: &str) {
         bincode::serialize_into(&mut stream, &gridnrend).unwrap();
         if gridnrend.winner != None {
             gridnrend.print_grid();
+            if gridnrend.winner == Some(Team::T) {
+                println!("Tied game.");
+                break;
+            }
             println!("{} has won.", gridnrend.winner.unwrap());
             break;
         }
@@ -35,6 +40,10 @@ pub fn run(hostip: &str) {
         gridnrend = bincode::deserialize_from(&mut stream).unwrap();
         if gridnrend.winner != None {
             gridnrend.print_grid();
+            if gridnrend.winner == Some(Team::T) {
+                println!("Tied game.");
+                break;
+            }
             println!("{} has won.", gridnrend.winner.unwrap());
             break;
         }

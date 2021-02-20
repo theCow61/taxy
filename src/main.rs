@@ -1,5 +1,6 @@
 mod server;
 mod client;
+use taxy::Team;
 
 fn _input() -> Result<String, std::io::Error> {
     let mut input = String::new();
@@ -15,6 +16,10 @@ fn offline() {
         match gridnrend.checkn_assert() {
             Some(tee) => {
                 gridnrend.print_grid();
+                if tee == Team::T {
+                    println!("Tied game.");
+                    break;
+                }
                 println!("{} has won.", tee);
                 break;
             },

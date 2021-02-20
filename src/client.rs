@@ -1,5 +1,6 @@
 use std::io::prelude::*;
 use taxy::GridnRend;
+use taxy::Team;
 
 pub fn run(hostip: &str) {
     let mut stream = std::net::TcpStream::connect(hostip).expect("Could not connect...");
@@ -17,6 +18,10 @@ pub fn run(hostip: &str) {
         gridnrend = bincode::deserialize_from(&mut stream).unwrap();
         if gridnrend.winner != None {
             gridnrend.print_grid();
+            if gridnrend.winner == Some(Team::T) {
+                println!("Tied game.");
+                break;
+            }
             println!("{} has won.", gridnrend.winner.unwrap());
             break;
         }
@@ -28,6 +33,10 @@ pub fn run(hostip: &str) {
         stream.write(&bytes).unwrap();
         if gridnrend.winner != None {
             gridnrend.print_grid();
+            if gridnrend.winner == Some(Team::T) {
+                println!("Tied game.");
+                break;
+            }
             println!("{} has won.", gridnrend.winner.unwrap());
             break;
         }
