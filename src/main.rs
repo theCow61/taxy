@@ -10,12 +10,12 @@ fn _input() -> Result<String, std::io::Error> {
 fn main() {
     let mut args = std::env::args().skip(1);
     let is_server: bool;
-    match args.next().expect("Usage: ./taxy [server/client] [ip]").as_str() {
+    match args.next().expect("Usage: ./taxy [server/client] [ip:port]").as_str() {
         "server" => { is_server = true; },
         "client" => { is_server = false; },
         _ => panic!("Usage: ./taxy [server/client] [ip]"),
     }
-    let hostip = format!("{}:42069", args.next().expect("Usage: ./taxy [server/client] [ip]"));
+    let hostip = format!("{}", args.next().expect("Usage: ./taxy [server/client] [ip:port]"));
     match is_server {
         true => {
             println!("Hosting on {}", hostip);
