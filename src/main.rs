@@ -7,15 +7,31 @@ fn _input() -> Result<String, std::io::Error> {
     // let res = input.parse::<u8>()?; // Experiment shows with this that ? if error returns with error and can be used with match on calling function. (Redirects Error)
     Ok(input)
 }
+fn offline() {
+    let mut gridnrend = taxy::GridnRend::new().unwrap();
+    loop {
+        gridnrend.print_grid();
+        gridnrend.inputn_update();
+        match gridnrend.checkn_assert() {
+            Some(tee) => {
+                gridnrend.print_grid();
+                println!("{} has won.", tee);
+                break;
+            },
+            None => continue,
+        }
+    }
+}
 fn main() {
     let mut args = std::env::args().skip(1);
     let is_server: bool;
-    match args.next().expect("Usage: ./taxy [server/client] [ip:port]").as_str() {
+    match args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]").as_str() {
         "server" => { is_server = true; },
         "client" => { is_server = false; },
-        _ => panic!("Usage: ./taxy [server/client] [ip]"),
+        "offline" => { offline(); return; },
+        _ => panic!("Usage: ./taxy [server/client/offline] [ip]"),
     }
-    let hostip = format!("{}", args.next().expect("Usage: ./taxy [server/client] [ip:port]"));
+    let hostip = format!("{}", args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]"));
     match is_server {
         true => {
             println!("Hosting on {}", hostip);
