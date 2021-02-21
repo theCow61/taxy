@@ -1,3 +1,8 @@
+/*
+ * theCow61 <theCow61@github.com>
+ * target: x86_64-unknown-linux-musl
+*/
+
 mod server;
 mod client;
 use taxy::Team;

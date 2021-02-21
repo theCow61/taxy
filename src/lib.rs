@@ -11,10 +11,13 @@ pub enum Team {
 impl std::fmt::Display for Team {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let printable = match *self {
-            Team::O => 'O',
-            Team::X => 'X',
-            Team::E => ' ',
-            Team::T => 'T',
+            Team::O => "\x1b[32;1mO\x1b[0m",
+            Team::X => "\x1b[31;1mX\x1b[0m",
+            Team::E => " ",
+            Team::T => "T",
+            /*
+             * TODO: Make colors not static as in say you are client and your team color is red and oponent is green, and then say on server side your team color is also red and your oponent is green,
+            */
         };
         write!(f, "{}", printable)
     }
@@ -64,10 +67,10 @@ impl GridnRend {
             for (_j, col) in row.iter().enumerate() {
                 match col {
                     Team::X => {
-                        print!(" \x1b[1m|\x1b[0m \x1b[31;1m{}\x1b[0m", col);
+                        print!(" \x1b[1m|\x1b[0m {}", col);
                     },
                     Team::O => {
-                        print!(" \x1b[1m|\x1b[0m \x1b[32;1m{}\x1b[0m", col);
+                        print!(" \x1b[1m|\x1b[0m {}", col);
                     },
                     _ => {
                         print!(" \x1b[1m|\x1b[0m {}", col);
