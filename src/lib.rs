@@ -54,16 +54,30 @@ impl GridnRend {
         );*/
         // let grid_format = format!("")
         // println!("{}", grid_format);
-        println!("    0   1   2");
+        /*
+         * TODO: Make this color ansi mess go away, figure out way to implement this into the Enum Display impl, also make it so its red no matter what team you are on and make it variable or something like that (Client side has different veiw of colors depending on team then server)
+        */
+        println!("    \x1b[34;1m0   1   2\x1b[0m");
         for (i, row) in self.grid_data.iter().enumerate() {
-            println!("  -------------");
-            print!("{}", i);
+            println!("  \x1b[1m-------------\x1b[0m");
+            print!("\x1b[34;1m{}\x1b[0m", i);
             for (_j, col) in row.iter().enumerate() {
-                print!(" | {}", col);
+                match col {
+                    Team::X => {
+                        print!(" \x1b[1m|\x1b[0m \x1b[31;1m{}\x1b[0m", col);
+                    },
+                    Team::O => {
+                        print!(" \x1b[1m|\x1b[0m \x1b[32;1m{}\x1b[0m", col);
+                    },
+                    _ => {
+                        print!(" \x1b[1m|\x1b[0m {}", col);
+                    },
+                }
+                // print!(" | {}", col);
             }
-            println!(" |")
+            println!(" \x1b[1m|\x1b[0m")
         }
-        println!("  -------------");
+        println!("  \x1b[1m-------------\x1b[0m");
 
     }
     pub fn inputn_update(&mut self) {
