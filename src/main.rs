@@ -34,14 +34,28 @@ fn offline() {
 }
 fn main() {
     let mut args = std::env::args().skip(1);
-    let is_server: bool;
-    match args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]").as_str() {
-        "server" => { is_server = true; },
-        "client" => { is_server = false; },
+    let is_server = match args.next() {
+        Some(valv) => {
+            match valv.as_str() {
+                "server" => true,
+                "client" => false,
+                "offline" =>  { offline(); return },
+                _ => { println!("Usage: ./taxy [server/client/offline] [ip:port]"); return },
+            }
+        },
+        None => { println!("Usage: ./taxy [server/client/offline] [ip:port]"); return },
+    };
+    /*let is_server: bool = match args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]").as_str() {
+        "server" => true,
+        "client" => false,
         "offline" => { offline(); return; },
-        _ => panic!("Usage: ./taxy [server/client/offline] [ip]"),
-    }
-    let hostip = format!("{}", args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]"));
+        _ => { println!("Usage: ./taxy [server/client/offline] [ip:port]"); return },
+    }; */
+    let hostip = match args.next() {
+        Some(valv) => valv,
+        None => { println!("Usage: ./taxy [server/client/offline] [ip:port]"); return },
+    };
+    // let hostip = format!("{}", args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]"));
     match is_server {
         true => {
             println!("Hosting on {}", hostip);
