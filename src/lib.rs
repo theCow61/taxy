@@ -132,7 +132,7 @@ impl GridnRend {
         if self.winner != None {
             return Some(self.winner.unwrap());
         }
-        for i in 0..3{
+        /*for i in 0..3{
             // if self.grid_data[i][0] == self.active_team {
                 // println!("hiii");
             // }
@@ -144,7 +144,34 @@ impl GridnRend {
                 self.winner = Some(self.active_team);
                 return Some(self.active_team)
             }
+            if self.grid_data[i][0..3].iter().all(|&i| i == self.active_team) {
+
+            }
+        }*/
+        for i in 0..3 {
+            /*println!("L: {:?}", &self.grid_data[i][..3]);
+            if &self.grid_data[i][..3] == &[self.active_team; 3] {
+                println!("L");
+                self.winner = Some(self.active_team);
+                return Some(self.active_team)
+            }
+            println!("H: {:?}", &self.grid_data[..3][i]);
+            if &self.grid_data[..3][i] == &[self.active_team; 3] {
+                println!("H");
+                self.winner = Some(self.active_team);
+                return Some(self.active_team)
+            }*/
+            if self.grid_data[i][0..3].iter().all(|&i| i == self.active_team) {
+                println!("L");
+                self.winner = Some(self.active_team);
+                return Some(self.active_team)
+            }
+            if self.grid_data[0][i] == self.active_team && self.grid_data[1][i] == self.active_team && self.grid_data[2][i] == self.active_team { // I DON'T KNOW WHY THIS WONT BEHAVE
+                self.winner = Some(self.active_team);
+                return Some(self.active_team)
+            }
         }
+
         if self.grid_data[0][0] == self.active_team && self.grid_data[1][1] == self.active_team && self.grid_data[2][2] == self.active_team {
             self.winner = Some(self.active_team);
             return Some(self.active_team)
@@ -163,6 +190,8 @@ impl GridnRend {
             self.winner = Some(Team::T);
             return Some(self.winner.unwrap())
         }
+
+
         // switch teams if doesn't win
         match self.active_team {
             Team::X => self.active_team = Team::O,
