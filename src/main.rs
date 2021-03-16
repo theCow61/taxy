@@ -1,6 +1,7 @@
 /*
  * theCow61 <theCow61@github.com>
  * target: x86_64-unknown-linux-musl
+ * TODO: Check shasums of client to make sure binary is same as server (optional)
 */
 
 mod server;
@@ -82,8 +83,8 @@ fn main() {
         }
     }*/
     // println!("{} is winner.", gridnrend.winner.unwrap());
-    /*match input() {
-        Ok(i) => println!("{}", i),
-        Err(_) => println!("format issue"),
-    }*/
+    // match input() {
+    //     Ok(i) => println!("{}", i),
+    //     Err(_) => println!("format issue"),
+    // }
 }
