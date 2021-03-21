@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
-use std::io::Write;
+use std::io::{Write, stdout, stdin};
+use termion::raw::IntoRawMode;
+use termion::event::{Key, Event, MouseEvent};
+use termion::input::TermRead;
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]//impl Copy for Team -- also works
 pub enum Team {
@@ -86,6 +89,7 @@ impl GridnRend {
     pub fn inputn_update(&mut self) {
         // todo: make it take input and update with new info
         println!("Which position to plot? ({})", self.active_team);
+	// Start of input and processing
         let (row, col) = loop {
             let mut input = String::new();
             let _ = std::io::stdout().flush();
@@ -120,6 +124,28 @@ impl GridnRend {
             }
             break (row_val, col_val);
         };
+	// End of user input and processing
+
+	let stdin = stdin();
+	let mut stdout = termion::input::MouseTerminal::from(stdout().into_raw_mode().unwrap());
+	write!(stdout, "{}Click where you want it.", termion::clear::All).unwrap();
+	stdout.flush().unwrap();
+
+	for c in stdin.events() {
+	    let evt = c.unwrap();
+	    match evt {
+		Event::Key(Key::Char('q')) => panic!(),
+		Event::Mouse(me) => {
+		    if let MouseEvent::Press(_, x, y) = me {
+			println!("{}{}", x, y);
+		    }
+		    else {
+		    }
+		},
+		_ => {},
+	    }
+	}
+	
         self.grid_data[row as usize][col as usize] = self.active_team;
         /*match self.active_team {
             Team::X => self.active_team = Team::O,
