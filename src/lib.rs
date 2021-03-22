@@ -1,3 +1,9 @@
+/*
+ *
+ * TODO: Make output and rendering of grid go through termion so you know where the empty spot
+ * locatations are to track the clicking of it.
+ *
+*/
 use serde::{Deserialize, Serialize};
 use std::io::{Write, stdout, stdin};
 use termion::raw::IntoRawMode;
