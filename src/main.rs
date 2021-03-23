@@ -4,8 +4,8 @@
  * TODO: Check shasums of client to make sure binary is same as server (optional)
 */
 
-mod server;
 mod client;
+mod server;
 use taxy::Team;
 
 fn _input() -> Result<String, std::io::Error> {
@@ -28,7 +28,7 @@ fn offline() {
                 }
                 println!("{} has won.", tee);
                 break;
-            },
+            }
             None => continue,
         }
     }
@@ -36,15 +36,22 @@ fn offline() {
 fn main() {
     let mut args = std::env::args().skip(1);
     let is_server = match args.next() {
-        Some(valv) => {
-            match valv.as_str() {
-                "server" => true,
-                "client" => false,
-                "offline" =>  { offline(); return },
-                _ => { println!("Usage: ./taxy [server/client/offline] [ip:port]"); return },
+        Some(valv) => match valv.as_str() {
+            "server" => true,
+            "client" => false,
+            "offline" => {
+                offline();
+                return;
+            }
+            _ => {
+                println!("Usage: ./taxy [server/client/offline] [ip:port]");
+                return;
             }
         },
-        None => { println!("Usage: ./taxy [server/client/offline] [ip:port]"); return },
+        None => {
+            println!("Usage: ./taxy [server/client/offline] [ip:port]");
+            return;
+        }
     };
     /*let is_server: bool = match args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]").as_str() {
         "server" => true,
@@ -54,14 +61,17 @@ fn main() {
     }; */
     let hostip = match args.next() {
         Some(valv) => valv,
-        None => { println!("Usage: ./taxy [server/client/offline] [ip:port]"); return },
+        None => {
+            println!("Usage: ./taxy [server/client/offline] [ip:port]");
+            return;
+        }
     };
     // let hostip = format!("{}", args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]"));
     match is_server {
         true => {
             println!("Hosting on {}", hostip);
             server::run(&hostip);
-        },
+        }
         false => {
             println!("Connecting to {}", hostip);
             client::run(&hostip);

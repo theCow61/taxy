@@ -29,10 +29,10 @@ pub fn run(hostip: &str) {
         }
         // let mut toDec: Vec<u8> = Vec::new();
         // let mut dex = loop {
-            // match stream.read(&mut toDec) {
-                // Ok(_) => { break toDec; },
-                // Err(_) => { continue; },
-            // }
+        // match stream.read(&mut toDec) {
+        // Ok(_) => { break toDec; },
+        // Err(_) => { continue; },
+        // }
         // };
         // stream.read(&mut toDec).unwrap();
         // println!("{:?}", toDec);
