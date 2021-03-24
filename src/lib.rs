@@ -3,6 +3,9 @@
  * TODO: Make output and rendering of grid go through termion so you know where the empty spot
  * locatations are to track the clicking of it.
  *
+ * TODO: Add stdin and stdout variables to the GridnRend struct and check if tty in main.rs and
+ * maybe pass that into the struct
+ *
 */
 use serde::{Deserialize, Serialize};
 use std::io::{stdin, stdout, Write};
