@@ -91,6 +91,16 @@ impl GridnRend {
             println!(" \x1b[1m|\x1b[0m")
         }
         println!("  \x1b[1m-------------\x1b[0m");
+
+        {
+            let stdout = std::io::stdout();
+            let mut stdout = stdout.lock().into_raw_mode().unwrap();
+            write!(stdout, "{}{}", termion::clear::All, termion::cursor::Goto(1, 1)).unwrap();
+            for (i, row) in self.grid_data.iter().enumerate() {
+                write!(stdout, "{}  {}---------{}", termion::cursor::Goto(1, (i + 1) as u16), termion::style::Bold, termion::style::Reset); // Good enough for now :|
+            }
+        }
+
     }
     pub fn inputn_update(&mut self) {
         // todo: make it take input and update with new info
