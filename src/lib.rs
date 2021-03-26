@@ -92,12 +92,16 @@ impl GridnRend {
         }
         println!("  \x1b[1m-------------\x1b[0m");
 
-        {
+        { // Idek, on the right track with that \n\r stuff tho 😏
             let stdout = std::io::stdout();
             let mut stdout = stdout.lock().into_raw_mode().unwrap();
             write!(stdout, "{}{}", termion::clear::All, termion::cursor::Goto(1, 1)).unwrap();
+            stdout.flush().unwrap();
             for (i, row) in self.grid_data.iter().enumerate() {
-                write!(stdout, "{}  {}---------{}", termion::cursor::Goto(1, (i + 1) as u16), termion::style::Bold, termion::style::Reset); // Good enough for now :|
+                write!(stdout, "{}---------{}\n\r", termion::style::Bold, termion::style::Reset).unwrap();
+                for (j, col) in row.iter().enumerate() {
+                    write!(stdout, "\n\r{}|{} {}", termion::style::Bold, termion::style::Reset, col).unwrap();
+                }
             }
         }
 
