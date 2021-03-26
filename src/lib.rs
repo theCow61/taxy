@@ -22,9 +22,21 @@ pub enum Team {
 }
 impl std::fmt::Display for Team {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let format_O = format!(
+            "{}{}O{}",
+            termion::style::Bold,
+            termion::color::Fg(termion::color::LightGreen),
+            termion::style::Reset
+        );
+        let format_X = format!(
+            "{}{}X{}",
+            termion::style::Bold,
+            termion::color::Fg(termion::color::LightRed),
+            termion::style::Reset
+        );
         let printable = match *self {
-            Team::O => "\x1b[32;1mO\x1b[0m",
-            Team::X => "\x1b[31;1mX\x1b[0m",
+            Team::O => &format_O,
+            Team::X => &format_X,
             Team::E => " ",
             Team::T => "T",
             /*
@@ -70,41 +82,61 @@ impl GridnRend {
         /*
          * TODO: Make this color ansi mess go away, figure out way to implement this into the Enum Display impl, also make it so its red no matter what team you are on and make it variable or something like that (Client side has different veiw of colors depending on team then server)
          */
-        println!("    \x1b[34;1m0   1   2\x1b[0m");
-        for (i, row) in self.grid_data.iter().enumerate() {
-            println!("  \x1b[1m-------------\x1b[0m");
-            print!("\x1b[34;1m{}\x1b[0m", i);
-            for (_j, col) in row.iter().enumerate() {
-                match col {
-                    Team::X => {
-                        print!(" \x1b[1m|\x1b[0m {}", col);
-                    }
-                    Team::O => {
-                        print!(" \x1b[1m|\x1b[0m {}", col);
-                    }
-                    _ => {
-                        print!(" \x1b[1m|\x1b[0m {}", col);
-                    }
-                }
-                // print!(" | {}", col);
-            }
-            println!(" \x1b[1m|\x1b[0m")
-        }
-        println!("  \x1b[1m-------------\x1b[0m");
 
-        { // Idek, on the right track with that \n\r stuff tho 😏
+        {
+            // Idek, on the right track with that \n\r stuff tho 😏
             let stdout = std::io::stdout();
             let mut stdout = stdout.lock().into_raw_mode().unwrap();
-            write!(stdout, "{}{}", termion::clear::All, termion::cursor::Goto(1, 1)).unwrap();
+            write!(
+                stdout,
+                "{}{}",
+                termion::clear::All,
+                termion::cursor::Goto(1, 1)
+            )
+            .unwrap();
             stdout.flush().unwrap();
-            for (i, row) in self.grid_data.iter().enumerate() {
-                write!(stdout, "{}---------{}\n\r", termion::style::Bold, termion::style::Reset).unwrap();
-                for (j, col) in row.iter().enumerate() {
-                    write!(stdout, "\n\r{}|{} {}", termion::style::Bold, termion::style::Reset, col).unwrap();
-                }
-            }
-        }
+            //for (i, row) in self.grid_data.iter().enumerate() {
+            //   write!(stdout, "{}---------{}\n\r", termion::style::Bold, termion::style::Reset).unwrap();
+            // for (j, col) in row.iter().enumerate() {
+            //   write!(stdout, "\n\r{}|{} {}", termion::style::Bold, termion::style::Reset, col).unwrap();
+            //}
+            // }
 
+            for row in self.grid_data.iter() {
+                write!(
+                    stdout,
+                    " {}-------------{}\n\r",
+                    termion::style::Bold,
+                    termion::style::Reset
+                )
+                .unwrap();
+                for col in row.iter() {
+                    write!(
+                        stdout,
+                        " {}|{} {}",
+                        termion::style::Bold,
+                        termion::style::Reset,
+                        col
+                    )
+                    .unwrap();
+                    // print!(" | {}", col);
+                }
+                write!(
+                    stdout,
+                    " {}|{}\n\r",
+                    termion::style::Bold,
+                    termion::style::Reset
+                )
+                .unwrap();
+            }
+            write!(
+                stdout,
+                " {}-------------{}\n\r",
+                termion::style::Bold,
+                termion::style::Reset
+            )
+            .unwrap();
+        }
     }
     pub fn inputn_update(&mut self) {
         // todo: make it take input and update with new info
