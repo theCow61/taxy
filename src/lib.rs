@@ -53,15 +53,20 @@ pub struct GridnRend {
     pub grid_data: [[Team; 3]; 3],
     pub active_team: Team,
     pub winner: Option<Team>,
+    //stdin: std::io::Stdin,
+    //stdout: termion::raw::RawTerminal<std::io::StdoutLock<'static>>,
 }
 
 impl GridnRend {
     pub fn new() -> Result<GridnRend, std::io::Error> {
         let grid_chan: [[Team; 3]; 3] = [[Team::E; 3]; 3];
+       // let stdout = std::io::stdout();
         Ok(GridnRend {
             grid_data: grid_chan,
             active_team: Team::X,
             winner: None,
+      //      stdin: std::io::stdin(),
+     //       stdout: stdout.lock().into_raw_mode().unwrap(),
         })
     }
     pub fn print_grid(&self) {
@@ -83,52 +88,25 @@ impl GridnRend {
          * TODO: Make this color ansi mess go away, figure out way to implement this into the Enum Display impl, also make it so its red no matter what team you are on and make it variable or something like that (Client side has different veiw of colors depending on team then server)
          */
 
-        {
-            // Idek, on the right track with that \n\r stuff tho 😏
-            let stdout = std::io::stdout();
-            let mut stdout = stdout.lock().into_raw_mode().unwrap();
-            write!(
-                stdout,
-                "{}{}",
-                termion::clear::All,
-                termion::cursor::Goto(1, 1)
-            )
-            .unwrap();
-            stdout.flush().unwrap();
-            //for (i, row) in self.grid_data.iter().enumerate() {
-            //   write!(stdout, "{}---------{}\n\r", termion::style::Bold, termion::style::Reset).unwrap();
-            // for (j, col) in row.iter().enumerate() {
-            //   write!(stdout, "\n\r{}|{} {}", termion::style::Bold, termion::style::Reset, col).unwrap();
-            //}
-            // }
+        // Idek, on the right track with that \n\r stuff tho 😏
+        let stdout = std::io::stdout();
+        let mut stdout = stdout.lock().into_raw_mode().unwrap();
+        write!(
+            stdout,
+            "{}{}",
+            termion::clear::All,
+            termion::cursor::Goto(1, 1)
+        )
+        .unwrap();
+        stdout.flush().unwrap();
+        //for (i, row) in self.grid_data.iter().enumerate() {
+        //   write!(stdout, "{}---------{}\n\r", termion::style::Bold, termion::style::Reset).unwrap();
+        // for (j, col) in row.iter().enumerate() {
+        //   write!(stdout, "\n\r{}|{} {}", termion::style::Bold, termion::style::Reset, col).unwrap();
+        //}
+        // }
 
-            for row in self.grid_data.iter() {
-                write!(
-                    stdout,
-                    " {}-------------{}\n\r",
-                    termion::style::Bold,
-                    termion::style::Reset
-                )
-                .unwrap();
-                for col in row.iter() {
-                    write!(
-                        stdout,
-                        " {}|{} {}",
-                        termion::style::Bold,
-                        termion::style::Reset,
-                        col
-                    )
-                    .unwrap();
-                    // print!(" | {}", col);
-                }
-                write!(
-                    stdout,
-                    " {}|{}\n\r",
-                    termion::style::Bold,
-                    termion::style::Reset
-                )
-                .unwrap();
-            }
+        for row in self.grid_data.iter() {
             write!(
                 stdout,
                 " {}-------------{}\n\r",
@@ -136,7 +114,32 @@ impl GridnRend {
                 termion::style::Reset
             )
             .unwrap();
+            for col in row.iter() {
+                write!(
+                    stdout,
+                    " {}|{} {}",
+                    termion::style::Bold,
+                    termion::style::Reset,
+                    col
+                )
+                .unwrap();
+                // print!(" | {}", col);
+            }
+            write!(
+                stdout,
+                " {}|{}\n\r",
+                termion::style::Bold,
+                termion::style::Reset
+            )
+            .unwrap();
         }
+        write!(
+            stdout,
+            " {}-------------{}\n\r",
+            termion::style::Bold,
+            termion::style::Reset
+        )
+        .unwrap();
     }
     pub fn inputn_update(&mut self) {
         // todo: make it take input and update with new info
@@ -144,7 +147,8 @@ impl GridnRend {
         let stdin = std::io::stdin();
         let tup: (u32, u32);
         if termion::is_tty(&std::io::stdin()) {
-            tup = validate_input_tty(&self, stdin); // Maybe create stdin variable before this if statement and pass it as an argument to this function and the other non_tty function?
+            //tup = validate_input_tty(&self, stdin); // Maybe create stdin variable before this if statement and pass it as an argument to this function and the other non_tty function?
+            tup = prodjection(stdin);
         }
         // End of user input and processing
         else {
@@ -287,6 +291,43 @@ fn validate_input_tty(bruh: &GridnRend, stdin: std::io::Stdin) -> (u32, u32) {
         break (row_val, col_val);
     };
     (row, col)
+}
+
+fn prodjection(stdin: std::io::Stdin) -> (u32, u32) {
+    let stdout = stdout();
+    let mut stdout = stdout.lock().into_raw_mode().unwrap();
+    write!(stdout, "{}", termion::cursor::Goto(1, 2)).unwrap();
+    for c in stdin.events() {
+        let evt = c.unwrap();
+        match evt {
+            Event::Key(Key::Char('q')) => {
+                write!(stdout, "{}", termion::clear::All).unwrap();
+                panic!();
+            },
+            Event::Key(Key::Char('j')) => {
+            },
+            Event::Key(Key::Char('k')) => {
+
+            },
+            Event::Key(Key::Char('h')) => { // Cant tell if this works or not with the 'h' key until i get those * sorted out
+                if termion::cursor::DetectCursorPos::cursor_pos(&mut stdout).unwrap().0 > 4 {
+                    write!(stdout, "{}{}*", termion::cursor::Left(3), termion::cursor::BlinkingUnderline).unwrap();
+                }
+            },
+            Event::Key(Key::Char('l')) => { /* TODO: Create a type that displays the * thing when selected and do it in the scope of these events, implement Drop for it so when it gets out of scope you can make the symbol * disapeer... */
+                if termion::cursor::DetectCursorPos::cursor_pos(&mut stdout).unwrap().0 < 10 {
+                    write!(stdout, "{}{}*", termion::cursor::Right(3), termion::cursor::BlinkingUnderline).unwrap();
+                }
+                //write!(stdout, "{}{}*", termion::cursor::Right(3), termion::cursor::BlinkingUnderline).unwrap();
+            },
+            _ => {},
+        }
+        stdout.flush().unwrap();
+    }   
+
+    stdout.flush().unwrap();
+    // TODO: MAKE BINKING * 
+    (1, 1)
 }
 
 fn validate_input_non_tty(stdin: std::io::Stdin) -> (u32, u32) {
