@@ -7,6 +7,7 @@
 mod client;
 mod server;
 use taxy::Team;
+use termion::raw::IntoRawMode;
 
 fn _input() -> Result<String, std::io::Error> {
     let mut input = String::new();
@@ -16,12 +17,13 @@ fn _input() -> Result<String, std::io::Error> {
 }
 fn offline() {
     let mut gridnrend = taxy::GridnRend::new().unwrap();
+    let mut screen = std::io::stdout().into_raw_mode().unwrap();
     loop {
-        gridnrend.print_grid();
-        gridnrend.inputn_update();
+        gridnrend.print_grid(&mut screen);
+        gridnrend.inputn_update(&mut screen);
         match gridnrend.checkn_assert() {
             Some(tee) => {
-                gridnrend.print_grid();
+                gridnrend.print_grid(&mut screen);
                 if tee == Team::T {
                     println!("Tied game.");
                     break;

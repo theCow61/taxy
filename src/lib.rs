@@ -8,7 +8,10 @@
  *
 */
 use serde::{Deserialize, Serialize};
-use std::io::{stdin, stdout, Write};
+use std::{
+    io::{stdin, stdout, Write},
+    ops::DerefMut,
+};
 use termion::event::{Event, Key, MouseEvent};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
@@ -54,22 +57,22 @@ pub struct GridnRend {
     pub active_team: Team,
     pub winner: Option<Team>,
     //stdin: std::io::Stdin,
-    //stdout: termion::raw::RawTerminal<std::io::StdoutLock<'static>>,
+    //stdout: termion::raw::RawTerminal<std::io::StdoutLock<'a>>,
 }
 
 impl GridnRend {
     pub fn new() -> Result<GridnRend, std::io::Error> {
         let grid_chan: [[Team; 3]; 3] = [[Team::E; 3]; 3];
-       // let stdout = std::io::stdout();
+        // let stdout = std::io::stdout();
         Ok(GridnRend {
             grid_data: grid_chan,
             active_team: Team::X,
             winner: None,
-      //      stdin: std::io::stdin(),
-     //       stdout: stdout.lock().into_raw_mode().unwrap(),
+            //       stdin: std::io::stdin(),
+            //      stdout: stdout.lock().into_raw_mode().unwrap(),
         })
     }
-    pub fn print_grid(&self) {
+    pub fn print_grid(&self, screen: &mut termion::raw::RawTerminal<std::io::Stdout>) {
         // Prints the grid with whats already stored in struct's data.
         /*let grid_format = format!("    0   1   2 \n  -------------\n0 | {} | {} | {} |\n  -------------\n1 | {} | {} | {} |\n  -------------\n2 | {} | {} | {} |\n  -------------",
                                   self.grid_data[0],
@@ -89,16 +92,16 @@ impl GridnRend {
          */
 
         // Idek, on the right track with that \n\r stuff tho 😏
-        let stdout = std::io::stdout();
-        let mut stdout = stdout.lock().into_raw_mode().unwrap();
+        // let stdout = std::io::stdout();
+        // let mut stdout = stdout.lock().into_raw_mode().unwrap();
         write!(
-            stdout,
+            screen,
             "{}{}",
             termion::clear::All,
             termion::cursor::Goto(1, 1)
         )
         .unwrap();
-        stdout.flush().unwrap();
+        screen.flush().unwrap();
         //for (i, row) in self.grid_data.iter().enumerate() {
         //   write!(stdout, "{}---------{}\n\r", termion::style::Bold, termion::style::Reset).unwrap();
         // for (j, col) in row.iter().enumerate() {
@@ -108,7 +111,7 @@ impl GridnRend {
 
         for row in self.grid_data.iter() {
             write!(
-                stdout,
+                screen,
                 " {}-------------{}\n\r",
                 termion::style::Bold,
                 termion::style::Reset
@@ -116,7 +119,7 @@ impl GridnRend {
             .unwrap();
             for col in row.iter() {
                 write!(
-                    stdout,
+                    screen,
                     " {}|{} {}",
                     termion::style::Bold,
                     termion::style::Reset,
@@ -126,7 +129,7 @@ impl GridnRend {
                 // print!(" | {}", col);
             }
             write!(
-                stdout,
+                screen,
                 " {}|{}\n\r",
                 termion::style::Bold,
                 termion::style::Reset
@@ -134,21 +137,22 @@ impl GridnRend {
             .unwrap();
         }
         write!(
-            stdout,
+            screen,
             " {}-------------{}\n\r",
             termion::style::Bold,
             termion::style::Reset
         )
         .unwrap();
     }
-    pub fn inputn_update(&mut self) {
+    pub fn inputn_update(&mut self, screen: &mut termion::raw::RawTerminal<std::io::Stdout>) {
         // todo: make it take input and update with new info
         println!("Which position to plot? ({})", self.active_team);
+        println!("\r{}{}{}Hint: {}{}Use h,j,k,l keys to naviage grid and Enter key to select spot.{}", termion::cursor::Hide, termion::style::Bold, termion::color::Fg(termion::color::LightMagenta), termion::style::Reset, termion::style::Faint, termion::style::Reset);
         let stdin = std::io::stdin();
-        let tup: (u32, u32);
+        let tup: (u8, u8);
         if termion::is_tty(&std::io::stdin()) {
             //tup = validate_input_tty(&self, stdin); // Maybe create stdin variable before this if statement and pass it as an argument to this function and the other non_tty function?
-            tup = prodjection(stdin);
+            tup = prodjection(stdin, screen, &self.grid_data);
         }
         // End of user input and processing
         else {
@@ -293,44 +297,135 @@ fn validate_input_tty(bruh: &GridnRend, stdin: std::io::Stdin) -> (u32, u32) {
     (row, col)
 }
 
-fn prodjection(stdin: std::io::Stdin) -> (u32, u32) {
-    let stdout = stdout();
-    let mut stdout = stdout.lock().into_raw_mode().unwrap();
-    write!(stdout, "{}", termion::cursor::Goto(1, 2)).unwrap();
+fn prodjection(
+    stdin: std::io::Stdin,
+    screen: &mut termion::raw::RawTerminal<std::io::Stdout>,
+    team_grid: &[[Team; 3]; 3],
+) -> (u8, u8) {
+    write!(screen, "{}", termion::cursor::Goto(1, 2)).unwrap();
+    let mut selection = Selection { is_selected: false };
     for c in stdin.events() {
         let evt = c.unwrap();
         match evt {
             Event::Key(Key::Char('q')) => {
-                write!(stdout, "{}", termion::clear::All).unwrap();
+                write!(screen, "{}", termion::clear::All).unwrap();
                 panic!();
-            },
+            }
             Event::Key(Key::Char('j')) => {
-            },
-            Event::Key(Key::Char('k')) => {
-
-            },
-            Event::Key(Key::Char('h')) => { // Cant tell if this works or not with the 'h' key until i get those * sorted out
-                if termion::cursor::DetectCursorPos::cursor_pos(&mut stdout).unwrap().0 > 4 {
-                    write!(stdout, "{}{}*", termion::cursor::Left(3), termion::cursor::BlinkingUnderline).unwrap();
+                let pos = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
+                if pos == (1, 2) {
+                    // selection.old_pos = Some((4, 4));
+                    selection.is_selected = true;
+                    write!(
+                        screen,
+                        "{}{}{}*{}",
+                        termion::cursor::Goto(4, 4),
+                        termion::cursor::BlinkingUnderline,
+                        termion::style::Blink,
+                        termion::style::Reset
+                    )
+                    .unwrap();
+                } else if pos.1 < 6 {
+                    selection.unhighlight(screen, team_grid, pos);
+                    // selection.old_pos = Some((pos.0 - 1, pos.1 - 2));
+                    selection.is_selected = true;
+                    write!(
+                        screen,
+                        "{}{}{}{}*{}",
+                        termion::cursor::Left(1),
+                        termion::cursor::Down(2),
+                        termion::cursor::BlinkingUnderline,
+                        termion::style::Blink,
+                        termion::style::Reset
+                    )
+                    .unwrap();
                 }
-            },
-            Event::Key(Key::Char('l')) => { /* TODO: Create a type that displays the * thing when selected and do it in the scope of these events, implement Drop for it so when it gets out of scope you can make the symbol * disapeer... */
-                if termion::cursor::DetectCursorPos::cursor_pos(&mut stdout).unwrap().0 < 10 {
-                    write!(stdout, "{}{}*", termion::cursor::Right(3), termion::cursor::BlinkingUnderline).unwrap();
+            }
+            Event::Key(Key::Char('k')) => {
+                let pos = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
+                if pos.1 > 2 {
+                    selection.unhighlight(screen, team_grid, pos);
+                    selection.is_selected = true;
+                    write!(
+                        screen,
+                        "{}{}{}{}*{}",
+                        termion::cursor::Left(1),
+                        termion::cursor::Up(2),
+                        termion::cursor::BlinkingUnderline,
+                        termion::style::Blink,
+                        termion::style::Reset
+                    )
+                    .unwrap();
+                }
+            }
+            Event::Key(Key::Char('h')) => {
+                // Cant tell if this works or not with the 'h' key until i get those * sorted out
+                let pos = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
+                if pos.0 > 5 {
+                    selection.unhighlight(screen, team_grid, pos);
+                    selection.is_selected = true;
+                    write!(
+                        screen,
+                        "{}{}{}*{}",
+                        termion::cursor::Left(5),
+                        termion::cursor::BlinkingUnderline,
+                        termion::style::Blink,
+                        termion::style::Reset
+                    )
+                    .unwrap();
+                }
+            }
+            Event::Key(Key::Char('l')) => {
+                /* TODO: Create a type that displays the * thing when selected and do it in the scope of these events, implement Drop for it so when it gets out of scope you can make the symbol * disapeer... */
+                let pos = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
+                if pos.0 < 10 {
+                    // if let Some(old_pos) = selection {
+                    //     write!(screen, "{} ", termion::cursor::Goto(old_pos.0, old_pos.1)).unwrap();
+                    // }
+                    // selection = Some((pos.0 + 3, pos.1));
+                    selection.unhighlight(screen, team_grid, pos);
+                    selection.is_selected = true;
+                    write!(
+                        screen,
+                        "{}{}{}*{}",
+                        termion::cursor::Right(3),
+                        termion::cursor::BlinkingUnderline,
+                        termion::style::Blink,
+                        termion::style::Reset
+                    )
+                    .unwrap();
                 }
                 //write!(stdout, "{}{}*", termion::cursor::Right(3), termion::cursor::BlinkingUnderline).unwrap();
-            },
-            _ => {},
+            }
+            Event::Key(Key::Char('\n')) => {
+                let pros = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
+                if pros != (1, 2) {
+                    let pos = (pros.0 - 1, pros.1);
+                    // let mut alt_screen = termion::screen::AlternateScreen::from(std::io::stdout());
+                    // write!(alt_screen, "test").unwrap();
+                    // alt_screen.flush().unwrap();
+                    // let pos_gridformat = (((pos.0 / 4) - 1) as u8, ((pos.1 / 2) - 1) as u8);
+                    let pos_gridformat = ((((pos.1 / 2) - 1) as u8), (((pos.0 / 4) - 1) as u8));
+                    if team_grid[pos_gridformat.0 as usize][pos_gridformat.1 as usize] == Team::E {
+                        return pos_gridformat;
+                    } else {
+                        let mut alt_screen = termion::screen::AlternateScreen::from(stdout());
+                        write!(alt_screen, "{}{}{}Spot already taken...", termion::cursor::Goto(1, 9), termion::style::Bold, termion::color::Fg(termion::color::LightMagenta)).unwrap();
+                        alt_screen.flush().unwrap();
+                    }
+                }
+            }
+            _ => {}
         }
-        stdout.flush().unwrap();
-    }   
+        screen.flush().unwrap();
+    }
 
-    stdout.flush().unwrap();
-    // TODO: MAKE BINKING * 
+    screen.flush().unwrap();
+    // TODO: GET ALT SCREEN TO WORK. ADD MOUSE SUPPORT.
     (1, 1)
 }
 
-fn validate_input_non_tty(stdin: std::io::Stdin) -> (u32, u32) {
+fn validate_input_non_tty(stdin: std::io::Stdin) -> (u8, u8) {
     // let stdin = stdin();
     let mut stdout = termion::input::MouseTerminal::from(stdout().into_raw_mode().unwrap());
     write!(stdout, "{}Click where you want it.", termion::clear::All).unwrap();
@@ -351,4 +446,23 @@ fn validate_input_non_tty(stdin: std::io::Stdin) -> (u32, u32) {
     }
 
     (1, 1)
+}
+
+struct Selection {
+    // old_pos: Option<(u16, u16)>, // To delete
+    is_selected: bool,
+}
+impl Selection {
+    fn unhighlight(
+        &self,
+        screen: &mut termion::raw::RawTerminal<std::io::Stdout>,
+        team_grid: &[[Team; 3]; 3],
+        pos: (u16, u16),
+    ) {
+        if self.is_selected {
+            let real_pos = (pos.0 - 1, pos.1);
+            let team = team_grid[((real_pos.1 / 2) - 1) as usize][((real_pos.0 / 4) - 1) as usize];
+            write!(screen, "{}{}", termion::cursor::Left(1), team).unwrap();
+        }
+    }
 }
