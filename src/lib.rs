@@ -8,10 +8,7 @@
  *
 */
 use serde::{Deserialize, Serialize};
-use std::{
-    io::{stdin, stdout, Write},
-    ops::DerefMut,
-};
+use std::io::{stdout, Write};
 use termion::event::{Event, Key, MouseEvent};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
@@ -25,21 +22,21 @@ pub enum Team {
 }
 impl std::fmt::Display for Team {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let format_O = format!(
+        let format_o = format!(
             "{}{}O{}",
             termion::style::Bold,
             termion::color::Fg(termion::color::LightGreen),
             termion::style::Reset
         );
-        let format_X = format!(
+        let format_x = format!(
             "{}{}X{}",
             termion::style::Bold,
             termion::color::Fg(termion::color::LightRed),
             termion::style::Reset
         );
         let printable = match *self {
-            Team::O => &format_O,
-            Team::X => &format_X,
+            Team::O => &format_o,
+            Team::X => &format_x,
             Team::E => " ",
             Team::T => "T",
             /*
@@ -147,7 +144,15 @@ impl GridnRend {
     pub fn inputn_update(&mut self, screen: &mut termion::raw::RawTerminal<std::io::Stdout>) {
         // todo: make it take input and update with new info
         println!("Which position to plot? ({})", self.active_team);
-        println!("\r{}{}{}Hint: {}{}Use h,j,k,l keys to naviage grid and Enter key to select spot.{}", termion::cursor::Hide, termion::style::Bold, termion::color::Fg(termion::color::LightMagenta), termion::style::Reset, termion::style::Faint, termion::style::Reset);
+        println!(
+            "\r{}{}{}Hint: {}{}Use h,j,k,l keys to naviage grid and Enter key to select spot.{}",
+            termion::cursor::Hide,
+            termion::style::Bold,
+            termion::color::Fg(termion::color::LightMagenta),
+            termion::style::Reset,
+            termion::style::Faint,
+            termion::style::Reset
+        );
         let stdin = std::io::stdin();
         let tup: (u8, u8);
         if termion::is_tty(&std::io::stdin()) {
@@ -258,7 +263,7 @@ impl GridnRend {
     }
 }
 
-fn validate_input_tty(bruh: &GridnRend, stdin: std::io::Stdin) -> (u32, u32) {
+fn _validate_input_tty(bruh: &GridnRend, stdin: std::io::Stdin) -> (u32, u32) {
     let (row, col) = loop {
         let mut input = String::new();
         let _ = std::io::stdout().flush();
@@ -410,7 +415,14 @@ fn prodjection(
                         return pos_gridformat;
                     } else {
                         let mut alt_screen = termion::screen::AlternateScreen::from(stdout());
-                        write!(alt_screen, "{}{}{}Spot already taken...", termion::cursor::Goto(1, 9), termion::style::Bold, termion::color::Fg(termion::color::LightMagenta)).unwrap();
+                        write!(
+                            alt_screen,
+                            "{}{}{}Spot already taken...",
+                            termion::cursor::Goto(1, 9),
+                            termion::style::Bold,
+                            termion::color::Fg(termion::color::LightMagenta)
+                        )
+                        .unwrap();
                         alt_screen.flush().unwrap();
                     }
                 }
