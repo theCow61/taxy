@@ -3,7 +3,8 @@ use taxy::Team;
 use termion::raw::IntoRawMode;
 
 pub fn run(hostip: &str) {
-    let mut screen = std::io::stdout().into_raw_mode().unwrap();
+    // let mut screen = std::io::stdout().into_raw_mode().unwrap();
+    let mut screen = termion::input::MouseTerminal::from(std::io::stdout().into_raw_mode().unwrap());
     let listener = std::net::TcpListener::bind(hostip).expect("Could not bind...");
     let (mut stream, socket_addr) = listener.accept().expect("Failed to accept...");
     println!("{} has connected...", socket_addr);

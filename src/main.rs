@@ -17,7 +17,8 @@ fn _input() -> Result<String, std::io::Error> {
 }
 fn offline() {
     let mut gridnrend = taxy::GridnRend::new().unwrap();
-    let mut screen = std::io::stdout().into_raw_mode().unwrap();
+    // let mut screen = std::io::stdout().into_raw_mode().unwrap();
+    let mut screen = termion::input::MouseTerminal::from(std::io::stdout().into_raw_mode().unwrap());
     loop {
         gridnrend.print_grid(&mut screen);
         gridnrend.inputn_update(&mut screen);
