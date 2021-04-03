@@ -9,9 +9,12 @@
 */
 use serde::{Deserialize, Serialize};
 use std::io::{stdout, Write};
-use termion::{event::{Event, Key, MouseEvent}, input::MouseTerminal};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
+use termion::{
+    event::{Event, Key, MouseEvent},
+    input::MouseTerminal,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)] //impl Copy for Team -- also works
 pub enum Team {
@@ -308,7 +311,10 @@ fn prodjection(
     team_grid: &[[Team; 3]; 3],
 ) -> (u8, u8) {
     write!(screen, "{}", termion::cursor::Goto(1, 2)).unwrap();
-    let mut selection = Selection { is_selected: false, selected_pos: (1, 2), };
+    let mut selection = Selection {
+        is_selected: false,
+        selected_pos: (1, 2),
+    };
     for c in stdin.events() {
         let evt = c.unwrap();
         match evt {
@@ -405,8 +411,12 @@ fn prodjection(
             Event::Mouse(me) => {
                 if let MouseEvent::Press(_, x, y) = me {
                     let gridified = (((x as i32 / 4) - 1), ((y as i32 / 2) - 1));
-                    if (0..3).contains(&gridified.1) && (0..3).contains(&gridified.0) && team_grid[gridified.1 as usize][gridified.0 as usize] == Team::E {
-                        return (gridified.0 as u8, gridified.1 as u8)
+                    if (0..3).contains(&gridified.1)
+                        && (0..3).contains(&gridified.0)
+                        && team_grid[gridified.1 as usize][gridified.0 as usize] == Team::E
+                    {
+                        // return (gridified.0 as u8, gridified.1 as u8)
+                        return (gridified.1 as u8, gridified.0 as u8);
                     }
                 }
                 // TODO: Make it so when your mouse hovers over a spot it highights it and when u click it, it registers it and enables it...
