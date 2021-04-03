@@ -495,3 +495,10 @@ impl Selection {
         }
     }
 }
+
+
+impl Drop for GridnRend {
+    fn drop(&mut self) {
+        println!("\r{}{}Thanks for playing.{}", termion::cursor::Down(3), termion::style::Faint, termion::cursor::Show);
+    }
+}
