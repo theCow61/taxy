@@ -7,11 +7,9 @@
 */
 use serde::{Deserialize, Serialize};
 use std::io::{stdout, Write};
+use termion::event::{Event, Key, MouseEvent};
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
-use termion::{
-    event::{Event, Key, MouseEvent},
-};
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)] //impl Copy for Team -- also works
 pub enum Team {
@@ -496,9 +494,13 @@ impl Selection {
     }
 }
 
-
 impl Drop for GridnRend {
     fn drop(&mut self) {
-        println!("\r{}{}Thanks for playing.{}", termion::cursor::Down(3), termion::style::Faint, termion::cursor::Show);
+        println!(
+            "\r{}{}Thanks for playing.{}",
+            termion::cursor::Down(3),
+            termion::style::Faint,
+            termion::cursor::Show
+        );
     }
 }
