@@ -1,10 +1,8 @@
 /*
  *
- * TODO: Make output and rendering of grid go through termion so you know where the empty spot
- * locatations are to track the clicking of it.
+ * TODO: Add a mouse click verification by maybe highlighting by hovering over with mouse
  *
- * TODO: Add stdin and stdout variables to the GridnRend struct and check if tty in main.rs and
- * maybe pass that into the struct
+ * TODO: instaid of using get_cursor_pos, track it instaid with the Selection struct so certain terminals dont brake with it.
  *
 */
 use serde::{Deserialize, Serialize};
@@ -13,7 +11,6 @@ use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use termion::{
     event::{Event, Key, MouseEvent},
-    input::MouseTerminal,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)] //impl Copy for Team -- also works
@@ -28,13 +25,13 @@ impl std::fmt::Display for Team {
         let format_o = format!(
             "{}{}O{}",
             termion::style::Bold,
-            termion::color::Fg(termion::color::LightGreen),
+            termion::color::Fg(termion::color::Green),
             termion::style::Reset
         );
         let format_x = format!(
             "{}{}X{}",
             termion::style::Bold,
-            termion::color::Fg(termion::color::LightRed),
+            termion::color::Fg(termion::color::Red),
             termion::style::Reset
         );
         let printable = match *self {
@@ -313,7 +310,7 @@ fn prodjection(
     write!(screen, "{}", termion::cursor::Goto(1, 2)).unwrap();
     let mut selection = Selection {
         is_selected: false,
-        selected_pos: (1, 2),
+        // selected_pos: (1, 2),
     };
     for c in stdin.events() {
         let evt = c.unwrap();
@@ -482,7 +479,7 @@ fn validate_input_non_tty(stdin: std::io::Stdin) -> (u8, u8) {
 struct Selection {
     // old_pos: Option<(u16, u16)>, // To delete
     is_selected: bool,
-    selected_pos: (u16, u16),
+    // selected_pos: (u16, u16),
 }
 impl Selection {
     fn unhighlight(
