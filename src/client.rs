@@ -4,21 +4,11 @@ use taxy::Team;
 use termion::raw::IntoRawMode;
 
 pub fn run(hostip: &str) {
-    // let mut screen = std::io::stdout().into_raw_mode().unwrap();
     let mut screen =
         termion::input::MouseTerminal::from(std::io::stdout().into_raw_mode().unwrap());
     let mut stream = std::net::TcpStream::connect(hostip).expect("Could not connect...");
     let mut gridnrend: GridnRend;
     loop {
-        // let mut toDec: Vec<u8> = Vec::new();
-        // let mut dex = loop {
-        // match stream.read(&mut toDec) {
-        // Ok(_) => { break toDec; },
-        // Err(_) => { continue; },
-        // }
-        // };
-        // stream.read(&mut toDec).unwrap();
-        // println!("{:?}", toDec);
         gridnrend = bincode::deserialize_from(&mut stream).unwrap();
         if gridnrend.winner != None {
             gridnrend.print_grid(&mut screen);
