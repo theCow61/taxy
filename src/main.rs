@@ -64,7 +64,7 @@ fn main() {
         "offline" => { offline(); return; },
         _ => { println!("Usage: ./taxy [server/client/offline] [ip:port]"); return },
     }; */
-    let hostip = match args.next() {
+    let mut hostip = match args.next() {
         Some(valv) => valv,
         None => {
             println!("Usage: ./taxy [server/client/offline] [ip:port]");
@@ -74,10 +74,18 @@ fn main() {
     // let hostip = format!("{}", args.next().expect("Usage: ./taxy [server/client/offline] [ip:port]"));
     match is_server {
         true => {
+            let mut split = hostip.split(':');
+            if split.next().expect("IP in form of <IP>:42069") == "localhost" {
+                hostip = format!("127.0.0.1:{}", split.next().expect("IP in form <IP>:42069"));
+            }
             println!("Hosting on {}", hostip);
             server::run(&hostip);
         }
         false => {
+            let mut split = hostip.split(':');
+            if split.next().expect("IP in form of <IP>:42069") == "localhost" {
+                hostip = format!("127.0.0.1:{}", split.next().expect("IP in form <IP>:42069"));
+            }
             println!("Connecting to {}", hostip);
             client::run(&hostip);
         }
