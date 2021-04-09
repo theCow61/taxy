@@ -103,19 +103,21 @@ impl GridnRend {
         //   write!(stdout, "\n\r{}|{} {}", termion::style::Bold, termion::style::Reset, col).unwrap();
         //}
         // }
-
-        for row in self.grid_data.iter() {
+        write!(screen, " {}┏━━━┳━━━┳━━━┓{}\n\r", termion::style::Bold, termion::style::Reset).unwrap();
+        for (i, row) in self.grid_data.iter() .enumerate(){
+            if i != 0 {
             write!(
                 screen,
-                " {}-------------{}\n\r",
+                " {}┣━━━╋━━━╋━━━┫{}\n\r",
                 termion::style::Bold,
                 termion::style::Reset
             )
             .unwrap();
+            }
             for col in row.iter() {
                 write!(
                     screen,
-                    " {}|{} {}",
+                    " {}┃{} {}",
                     termion::style::Bold,
                     termion::style::Reset,
                     col
@@ -125,7 +127,7 @@ impl GridnRend {
             }
             write!(
                 screen,
-                " {}|{}\n\r",
+                " {}┃{}\n\r",
                 termion::style::Bold,
                 termion::style::Reset
             )
@@ -133,7 +135,7 @@ impl GridnRend {
         }
         write!(
             screen,
-            " {}-------------{}\n\r",
+            " {}┗━━━┻━━━┻━━━┛{}\n\r",
             termion::style::Bold,
             termion::style::Reset
         )
