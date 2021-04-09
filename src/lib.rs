@@ -308,6 +308,7 @@ fn prodjection(
     write!(screen, "{}", termion::cursor::Goto(1, 2)).unwrap();
     let mut selection = Selection {
         is_selected: false,
+        current_pos: (1, 2),
         // selected_pos: (1, 2),
     };
     for c in stdin.events() {
@@ -318,88 +319,92 @@ fn prodjection(
                 panic!();
             }
             Event::Key(Key::Char('j')) => {
-                let pos = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
-                if pos == (1, 2) {
-                    // selection.old_pos = Some((4, 4));
-                    selection.is_selected = true;
-                    write!(
-                        screen,
-                        "{}{}{}*{}",
-                        termion::cursor::Goto(4, 4),
-                        termion::cursor::BlinkingUnderline,
-                        termion::style::Blink,
-                        termion::style::Reset
-                    )
-                    .unwrap();
-                } else if pos.1 < 6 {
-                    selection.unhighlight(screen, team_grid, pos);
-                    // selection.old_pos = Some((pos.0 - 1, pos.1 - 2));
-                    selection.is_selected = true;
-                    write!(
-                        screen,
-                        "{}{}{}{}*{}",
-                        termion::cursor::Left(1),
-                        termion::cursor::Down(2),
-                        termion::cursor::BlinkingUnderline,
-                        termion::style::Blink,
-                        termion::style::Reset
-                    )
-                    .unwrap();
+                if let Ok(pos) = termion::cursor::DetectCursorPos::cursor_pos(screen) {
+                    if pos == (1, 2) {
+                        // selection.old_pos = Some((4, 4));
+                        selection.is_selected = true;
+                        write!(
+                            screen,
+                            "{}{}{}*{}",
+                            termion::cursor::Goto(4, 4),
+                            termion::cursor::BlinkingUnderline,
+                            termion::style::Blink,
+                            termion::style::Reset
+                        )
+                        .unwrap();
+                    } else if pos.1 < 6 {
+                        selection.unhighlight(screen, team_grid, pos);
+                        // selection.old_pos = Some((pos.0 - 1, pos.1 - 2));
+                        selection.is_selected = true;
+                        write!(
+                            screen,
+                            "{}{}{}{}*{}",
+                            termion::cursor::Left(1),
+                            termion::cursor::Down(2),
+                            termion::cursor::BlinkingUnderline,
+                            termion::style::Blink,
+                            termion::style::Reset
+                        )
+                        .unwrap();
+                    }
                 }
             }
             Event::Key(Key::Char('k')) => {
-                let pos = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
-                if pos.1 > 2 {
-                    selection.unhighlight(screen, team_grid, pos);
-                    selection.is_selected = true;
-                    write!(
-                        screen,
-                        "{}{}{}{}*{}",
-                        termion::cursor::Left(1),
-                        termion::cursor::Up(2),
-                        termion::cursor::BlinkingUnderline,
-                        termion::style::Blink,
-                        termion::style::Reset
-                    )
-                    .unwrap();
+                if let Ok(pos) = termion::cursor::DetectCursorPos::cursor_pos(screen) {
+                    if pos.1 > 2 {
+                        selection.unhighlight(screen, team_grid, pos);
+                        selection.is_selected = true;
+                        write!(
+                            screen,
+                            "{}{}{}{}*{}",
+                            termion::cursor::Left(1),
+                            termion::cursor::Up(2),
+                            termion::cursor::BlinkingUnderline,
+                            termion::style::Blink,
+                            termion::style::Reset
+                        )
+                        .unwrap();
+                    }
                 }
             }
             Event::Key(Key::Char('h')) => {
                 // Cant tell if this works or not with the 'h' key until i get those * sorted out
-                let pos = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
-                if pos.0 > 5 {
-                    selection.unhighlight(screen, team_grid, pos);
-                    selection.is_selected = true;
-                    write!(
-                        screen,
-                        "{}{}{}*{}",
-                        termion::cursor::Left(5),
-                        termion::cursor::BlinkingUnderline,
-                        termion::style::Blink,
-                        termion::style::Reset
-                    )
-                    .unwrap();
+                if let Ok(pos) = termion::cursor::DetectCursorPos::cursor_pos(screen) {
+                    if pos.0 > 5 {
+                        selection.unhighlight(screen, team_grid, pos);
+                        selection.is_selected = true;
+                        write!(
+                            screen,
+                            "{}{}{}*{}",
+                            termion::cursor::Left(5),
+                            termion::cursor::BlinkingUnderline,
+                            termion::style::Blink,
+                            termion::style::Reset
+                        )
+                        .unwrap();
+                    }
                 }
             }
             Event::Key(Key::Char('l')) => {
                 /* TODO: Create a type that displays the * thing when selected and do it in the scope of these events, implement Drop for it so when it gets out of scope you can make the symbol * disapeer... */
-                let pos = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
-                if pos.0 < 10 {
-                    // if let Some(old_pos) = selection {
-                    //     write!(screen, "{} ", termion::cursor::Goto(old_pos.0, old_pos.1)).unwrap();
-                    // }
-                    // selection = Some((pos.0 + 3, pos.1));
-                    selection.unhighlight(screen, team_grid, pos);
-                    selection.is_selected = true;
-                    write!(
-                        screen,
-                        "{}{}{}*{}",
-                        termion::cursor::Right(3),
-                        termion::cursor::BlinkingUnderline,
-                        termion::style::Blink,
-                        termion::style::Reset
-                    )
-                    .unwrap();
+                if let Ok(pos) = termion::cursor::DetectCursorPos::cursor_pos(screen) {
+                    if pos.0 < 10 {
+                        // if let Some(old_pos) = selection {
+                        //     write!(screen, "{} ", termion::cursor::Goto(old_pos.0, old_pos.1)).unwrap();
+                        // }
+                        // selection = Some((pos.0 + 3, pos.1));
+                        selection.unhighlight(screen, team_grid, pos);
+                        selection.is_selected = true;
+                        write!(
+                            screen,
+                            "{}{}{}*{}",
+                            termion::cursor::Right(3),
+                            termion::cursor::BlinkingUnderline,
+                            termion::style::Blink,
+                            termion::style::Reset
+                        )
+                        .unwrap();
+                    }
                 }
                 //write!(stdout, "{}{}*", termion::cursor::Right(3), termion::cursor::BlinkingUnderline).unwrap();
             }
@@ -417,27 +422,30 @@ fn prodjection(
                 // TODO: Make it so when your mouse hovers over a spot it highights it and when u click it, it registers it and enables it...
             }
             Event::Key(Key::Char('\n')) => {
-                let pros = termion::cursor::DetectCursorPos::cursor_pos(screen).unwrap();
-                if pros != (1, 2) {
-                    let pos = (pros.0 - 1, pros.1);
-                    // let mut alt_screen = termion::screen::AlternateScreen::from(std::io::stdout());
-                    // write!(alt_screen, "test").unwrap();
-                    // alt_screen.flush().unwrap();
-                    // let pos_gridformat = (((pos.0 / 4) - 1) as u8, ((pos.1 / 2) - 1) as u8);
-                    let pos_gridformat = ((((pos.1 / 2) - 1) as u8), (((pos.0 / 4) - 1) as u8));
-                    if team_grid[pos_gridformat.0 as usize][pos_gridformat.1 as usize] == Team::E {
-                        return pos_gridformat;
-                    } else {
-                        let mut alt_screen = termion::screen::AlternateScreen::from(stdout());
-                        write!(
-                            alt_screen,
-                            "{}{}{}Spot already taken...",
-                            termion::cursor::Goto(1, 9),
-                            termion::style::Bold,
-                            termion::color::Fg(termion::color::LightMagenta)
-                        )
-                        .unwrap();
-                        alt_screen.flush().unwrap();
+                if let Ok(pros) = termion::cursor::DetectCursorPos::cursor_pos(screen) {
+                    if pros != (1, 2) {
+                        let pos = (pros.0 - 1, pros.1);
+                        // let mut alt_screen = termion::screen::AlternateScreen::from(std::io::stdout());
+                        // write!(alt_screen, "test").unwrap();
+                        // alt_screen.flush().unwrap();
+                        // let pos_gridformat = (((pos.0 / 4) - 1) as u8, ((pos.1 / 2) - 1) as u8);
+                        let pos_gridformat = ((((pos.1 / 2) - 1) as u8), (((pos.0 / 4) - 1) as u8));
+                        if team_grid[pos_gridformat.0 as usize][pos_gridformat.1 as usize]
+                            == Team::E
+                        {
+                            return pos_gridformat;
+                        } else {
+                            let mut alt_screen = termion::screen::AlternateScreen::from(stdout());
+                            write!(
+                                alt_screen,
+                                "{}{}{}Spot already taken...",
+                                termion::cursor::Goto(1, 9),
+                                termion::style::Bold,
+                                termion::color::Fg(termion::color::LightMagenta)
+                            )
+                            .unwrap();
+                            alt_screen.flush().unwrap();
+                        }
                     }
                 }
             }
@@ -478,6 +486,7 @@ struct Selection {
     // old_pos: Option<(u16, u16)>, // To delete
     is_selected: bool,
     // selected_pos: (u16, u16),
+    current_pos: (u16, u16),
 }
 impl Selection {
     fn unhighlight(
