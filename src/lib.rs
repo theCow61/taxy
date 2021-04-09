@@ -308,7 +308,6 @@ fn prodjection(
     write!(screen, "{}", termion::cursor::Goto(1, 2)).unwrap();
     let mut selection = Selection {
         is_selected: false,
-        current_pos: (1, 2),
         // selected_pos: (1, 2),
     };
     for c in stdin.events() {
@@ -486,7 +485,6 @@ struct Selection {
     // old_pos: Option<(u16, u16)>, // To delete
     is_selected: bool,
     // selected_pos: (u16, u16),
-    current_pos: (u16, u16),
 }
 impl Selection {
     fn unhighlight(
