@@ -2,6 +2,7 @@
  * theCow61 <theCow61@github.com>
  * target: x86_64-unknown-linux-musl
  * TODO: Check shasums of client to make sure binary is same as server (optional)
+ * TODO: Make it say "{} has won" in bold green if YOU won but red if YOU lost.
 */
 
 mod client;
@@ -30,7 +31,7 @@ fn offline() {
                     println!("Tied game.");
                     break;
                 }
-                println!("{} has won.", tee);
+                println!("{} has \x1b[31;1mwon\x1b[0m.", tee);
                 break;
             }
             None => continue,

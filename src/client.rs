@@ -26,7 +26,7 @@ pub fn run(hostip: &str) {
                 println!("Tied game.");
                 break;
             }
-            println!("{} has won.", gridnrend.winner.unwrap());
+            println!("{} has \x1b[31;1mwon\x1b[0m.", gridnrend.winner.unwrap());
             break;
         }
         gridnrend.print_grid(&mut screen);
@@ -41,7 +41,7 @@ pub fn run(hostip: &str) {
                 println!("Tied game.");
                 break;
             }
-            println!("{} has won.", gridnrend.winner.unwrap());
+            println!("{} has \x1b[31;1mwon\x1b[0m.", gridnrend.winner.unwrap());
             break;
         }
     }

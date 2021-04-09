@@ -28,7 +28,7 @@ pub fn run(hostip: &str) {
                 println!("Tied game.");
                 break;
             }
-            println!("{} has won.", gridnrend.winner.unwrap());
+            println!("{} has \x1b[31;1mwon\x1b[0m.", gridnrend.winner.unwrap());
             break;
         }
         // let mut toDec: Vec<u8> = Vec::new();
@@ -48,7 +48,7 @@ pub fn run(hostip: &str) {
                 println!("Tied game.");
                 break;
             }
-            println!("{} has won.", gridnrend.winner.unwrap());
+            println!("{} has \x1b[31;1mwon\x1b[0m.", gridnrend.winner.unwrap());
             break;
         }
     }
