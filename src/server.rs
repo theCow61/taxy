@@ -10,6 +10,7 @@ pub fn run(hostip: &str) {
     let (mut stream, socket_addr) = listener.accept().expect("Failed to accept...");
     println!("{} has connected...", socket_addr);
     let mut gridnrend = GridnRend::new().unwrap();
+    let cli_team = MyTeam { my_team: Team::X };
     // gridnrend.print_grid();
     // gridnrend.inputn_update();
     // gridnrend.checkn_assert();
@@ -22,14 +23,26 @@ pub fn run(hostip: &str) {
         // println!("{:?}", bytes);
         // stream.write(&bytes).unwrap();
         bincode::serialize_into(&mut stream, &gridnrend).unwrap();
-        if gridnrend.winner != None {
+        if let Some(winner) = gridnrend.winner {
             gridnrend.print_grid(&mut screen);
-            if gridnrend.winner == Some(Team::T) {
+            /*if gridnrend.winner == Some(Team::T) {
                 println!("Tied game.");
                 break;
             }
             println!("{} has \x1b[31;1mwon\x1b[0m.", gridnrend.winner.unwrap());
-            break;
+            break;*/
+            if winner == Team::T {
+                println!("Tied game.");
+                break;
+            }
+            if winner == cli_team.my_team {
+                println!("You({}) have \x1b[32;1mwon\x1b[0m.", cli_team.my_team);
+                break;
+            }
+            else {
+                println!("You({}) have \x1b[31;1mlost\x1b[0m.", cli_team.my_team);
+                break;
+            }
         }
         // let mut toDec: Vec<u8> = Vec::new();
         // let mut dex = loop {
@@ -52,4 +65,8 @@ pub fn run(hostip: &str) {
             break;
         }
     }
+}
+
+struct MyTeam {
+    my_team: Team,
 }
