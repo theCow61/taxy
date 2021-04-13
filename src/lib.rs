@@ -145,7 +145,7 @@ impl GridnRend {
         // todo: make it take input and update with new info
         println!("Which position to plot? ({})", self.active_team);
         println!(
-            "\r{}{}{}Hint: {}{}Use h,j,k,l keys to naviage grid and Enter key to select spot.{}",
+            "\r{}{}{}Hint: {}{}Use h,j,k,l keys to naviage grid and Enter key to select spot. You can also click with your mouse to select your spot.{}",
             termion::cursor::Hide,
             termion::style::Bold,
             termion::color::Fg(termion::color::LightMagenta),
