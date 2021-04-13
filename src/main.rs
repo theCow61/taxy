@@ -76,7 +76,8 @@ fn main() {
         true => {
             let mut split = hostip.split(':');
             if split.next().expect("IP in form of <IP>:42069") == "localhost" {
-                hostip = format!("127.0.0.1:{}", split.next().expect("IP in form <IP>:42069"));
+                // hostip = format!("127.0.0.1:{}", split.next().expect("IP in form <IP>:42069"));
+		hostip = format!("127.0.0.1:{}", split.next().unwrap_or("42069"));
             }
             println!("Hosting on {}", hostip);
             server::run(&hostip);
@@ -84,7 +85,8 @@ fn main() {
         false => {
             let mut split = hostip.split(':');
             if split.next().expect("IP in form of <IP>:42069") == "localhost" {
-                hostip = format!("127.0.0.1:{}", split.next().expect("IP in form <IP>:42069"));
+                // hostip = format!("127.0.0.1:{}", split.next().expect("IP in form <IP>:42069"));
+                hostip = format!("127.0.0.1:{}", split.next().unwrap_or("42069"));
             }
             println!("Connecting to {}", hostip);
             client::run(&hostip);
