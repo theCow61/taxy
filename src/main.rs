@@ -62,7 +62,11 @@ fn offline() {
 }
 fn main() {
     let cli: Cli = argh::from_env();
-    if cli.server {
+    if cli.offline {
+        offline();
+        return;
+    }
+    else if cli.server {
         server::run(&format!("{}:{}", cli.host, cli.port));
         return;
     } else if cli.client {
