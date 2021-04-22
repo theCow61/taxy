@@ -7,9 +7,9 @@
 
 mod client;
 mod server;
+use argh::FromArgs;
 use taxy::Team;
 use termion::raw::IntoRawMode;
-use argh::FromArgs;
 
 #[derive(FromArgs)]
 /// TicTacToe 😏
@@ -29,7 +29,7 @@ struct Cli {
     #[argh(option, default = "42069", short = 'p')]
     /// port to connect/listen (default is 42069)
     port: u16,
-    // enable switch for no mouse terminal 
+    // enable switch for no mouse terminal
 }
 
 fn _input() -> Result<String, std::io::Error> {
@@ -65,8 +65,7 @@ fn main() {
     if cli.offline {
         offline();
         return;
-    }
-    else if cli.server {
+    } else if cli.server {
         server::run(&format!("{}:{}", cli.host, cli.port));
         return;
     } else if cli.client {
@@ -114,7 +113,7 @@ fn main() {
             let mut split = hostip.split(':');
             if split.next().expect("IP in form of <IP>:42069") == "localhost" {
                 // hostip = format!("127.0.0.1:{}", split.next().expect("IP in form <IP>:42069"));
-		hostip = format!("127.0.0.1:{}", split.next().unwrap_or("42069"));
+        hostip = format!("127.0.0.1:{}", split.next().unwrap_or("42069"));
             }
             println!("Hosting on {}", hostip);
             server::run(&hostip);

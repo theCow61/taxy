@@ -22,7 +22,7 @@ pub fn run(hostip: &str) {
         // let bytes = bincode::serialize(&mut gridnrend).unwrap();
         // println!("{:?}", bytes);
         // stream.write(&bytes).unwrap();
-        
+
         if let Err(_) = bincode::serialize_into(&mut stream, &gridnrend) {
             println!("Lost connection...");
             return;
@@ -42,8 +42,7 @@ pub fn run(hostip: &str) {
             if winner == cli_team.my_team {
                 println!("You({}) have \x1b[32;1mwon\x1b[0m.", cli_team.my_team);
                 break;
-            }
-            else {
+            } else {
                 println!("You({}) have \x1b[31;1mlost\x1b[0m.", cli_team.my_team);
                 break;
             }
