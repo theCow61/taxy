@@ -9,6 +9,28 @@ mod client;
 mod server;
 use taxy::Team;
 use termion::raw::IntoRawMode;
+use argh::FromArgs;
+
+#[derive(FromArgs)]
+/// TicTacToe 😏
+struct Cli {
+    #[argh(switch, short = 's')]
+    /// listen
+    server: bool,
+    #[argh(switch, short = 'c')]
+    /// connect
+    client: bool,
+    #[argh(switch, short = 'o')]
+    /// offline (by default)
+    offline: bool,
+    #[argh(option, default = "String::from(\"0.0.0.0\")", short = 'h')]
+    /// host to connect/listen (default is localhost)
+    host: String,
+    #[argh(option, default = "42069", short = 'p')]
+    /// port to connect/listen (default is 42069)
+    port: u16,
+    // enable switch for no mouse terminal 
+}
 
 fn _input() -> Result<String, std::io::Error> {
     let mut input = String::new();
@@ -39,7 +61,18 @@ fn offline() {
     }
 }
 fn main() {
-    let mut args = std::env::args().skip(1);
+    let cli: Cli = argh::from_env();
+    if cli.server {
+        server::run(&format!("{}:{}", cli.host, cli.port));
+        return;
+    } else if cli.client {
+        client::run(&format!("{}:{}", cli.host, cli.port));
+        return;
+    } else {
+        offline();
+        return;
+    }
+    /*let mut args = std::env::args().skip(1);
     let is_server = match args.next() {
         Some(valv) => match valv.as_str() {
             "server" => true,
@@ -111,5 +144,5 @@ fn main() {
     // match input() {
     //     Ok(i) => println!("{}", i),
     //     Err(_) => println!("format issue"),
-    // }
+    // }*/
 }
