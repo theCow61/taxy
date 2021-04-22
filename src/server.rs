@@ -22,7 +22,11 @@ pub fn run(hostip: &str) {
         // let bytes = bincode::serialize(&mut gridnrend).unwrap();
         // println!("{:?}", bytes);
         // stream.write(&bytes).unwrap();
-        bincode::serialize_into(&mut stream, &gridnrend).unwrap();
+        
+        if let Err(_) = bincode::serialize_into(&mut stream, &gridnrend) {
+            println!("Lost connection...");
+            return;
+        }
         if let Some(winner) = gridnrend.winner {
             gridnrend.print_grid(&mut screen);
             /*if gridnrend.winner == Some(Team::T) {
@@ -54,7 +58,13 @@ pub fn run(hostip: &str) {
         // stream.read(&mut toDec).unwrap();
         // println!("{:?}", toDec);
         // gridnrend = bincode::deserialize(&mut toDec).unwrap();
-        gridnrend = bincode::deserialize_from(&mut stream).unwrap();
+        //gridnrend = bincode::deserialize_from(&mut stream).unwrap();
+        if let Ok(temprend) = bincode::deserialize_from::<_, GridnRend>(&mut stream) {
+            gridnrend = temprend;
+        } else {
+            println!("Connection lost...");
+            return;
+        }
         if gridnrend.winner != None {
             gridnrend.print_grid(&mut screen);
             if gridnrend.winner == Some(Team::T) {
