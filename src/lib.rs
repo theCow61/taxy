@@ -315,7 +315,7 @@ fn prodjection(
     for c in stdin.events() {
         let evt = c.unwrap();
         match evt {
-            Event::Key(Key::Char('q')) => {
+            Event::Key(Key::Char('q')) | Event::Key(Key::Ctrl('c')) => {
                 write!(screen, "{}", termion::clear::All).unwrap();
                 panic!();
             }
