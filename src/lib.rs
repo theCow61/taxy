@@ -462,7 +462,6 @@ fn prodjection(
     }
 
     screen.flush().unwrap();
-    // TODO: GET ALT SCREEN TO WORK. ADD MOUSE SUPPORT.
     (1, 1)
 }
 
